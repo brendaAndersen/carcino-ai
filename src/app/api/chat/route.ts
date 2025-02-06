@@ -7,7 +7,7 @@ export async function handler(req, res) {
       req.body,
       {
         headers: {
-          Authorization: `Bearer `, // adicionar key
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`, // adicionar key
           'Content-Type': 'application/json',
         },
       }

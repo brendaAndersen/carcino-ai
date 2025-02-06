@@ -14,7 +14,7 @@ export const Chat = () => {
             `https://api.dify.ai/v1/messages?user=abc-123&conversation_id=` + id,
             {
                 headers: {
-                    Authorization: `Bearer `, // adicionar key
+                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`, // adicionar key
                     'Content-Type': 'application/json',
                 },
             }
@@ -29,7 +29,7 @@ export const Chat = () => {
                 'https://api.dify.ai/v1/conversations?user=abc-123&last_id=&limit=20',
                 {
                     headers: {
-                        Authorization: `Bearer `, // adicionar key
+                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`, // adicionar key
                         'Content-Type': 'application/json',
                     },
                 });
@@ -41,7 +41,7 @@ export const Chat = () => {
     };
     return (
         <div className="space-y-4 overflow-y-auto max-h-[50rem] p-2">
-            {Object.values(conversation).map((chat: { id:string, name: string }) => (
+            {Object.values(conversation).map((chat: { id: string, name: string }) => (
                 <div
                     key={chat.id}
                     onClick={() => handleClick(chat.id)}

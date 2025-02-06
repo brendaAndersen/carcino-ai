@@ -80,7 +80,7 @@ export function ChatAI() {
           formData,
           {
             headers: {
-              Authorization: `Bearer `, // adicionar key
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`, // adicionar key
               'Content-Type': 'multipart/form-data',
             },
           }
@@ -101,7 +101,7 @@ export function ChatAI() {
           },
           {
             headers: {
-              Authorization: `Bearer `, // adicionar key
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`, // adicionar key
               'Content-Type': 'application/json',
             },
           }
@@ -141,7 +141,7 @@ export function ChatAI() {
       setFile(undefined);
     }
   };
-  
+
   return (
     <div className="flex min-h-[60px] items-center justify-center bg-slate-50 
     dark:bg-gray-900 text-black dark:text-slate-700 rounded-md">
