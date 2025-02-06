@@ -1,20 +1,12 @@
-import axios from 'axios';
+// src/app/api/chat/route.ts
+import { NextResponse } from "next/server";
 
-export async function handler(req, res) {
+export async function POST(req: Request) {
   try {
-    const response = await axios.post(
-      'https://api.dify.ai/v1/chat',
-      req.body,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`, // adicionar key
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-    res.status(200).json(response.data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const body = await req.json();
+    
+    return NextResponse.json({ message: "Mensagem recebida!", data: body });
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao processar a requisição' });
+    return NextResponse.json({ error: "Erro no servidor" }, { status: 500 });
   }
 }
