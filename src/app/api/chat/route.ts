@@ -7,13 +7,13 @@ export async function handler(req, res) {
       req.body,
       {
         headers: {
-          Authorization: `Bearer ${process.env.KEY_API}`,
+          Authorization: `Bearer `, // adicionar key
           'Content-Type': 'application/json',
         },
       }
     );
     res.status(200).json(response.data);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     res.status(500).json({ error: 'Erro ao processar a requisição' });
   }

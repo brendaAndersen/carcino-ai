@@ -1,4 +1,5 @@
 'use client'
+import { Chat } from "@/components/Chat";
 import { ThemeToggle } from "@/components/Toggle";
 import { ChatAI } from "@/components/ui/ChatAI";
 import React, { useState } from 'react';
@@ -25,7 +26,7 @@ export default function Home() {
       </button>
 
       <div
-        className={`fixed top-0 left-0 h-full w-64 p-2 bg-[#226094] dark:bg-slate-950 text-white transform rounded-r-md ${
+        className={`fixed top-0 left-0 h-full w-80 p-2 bg-[#226094] dark:bg-slate-950 text-white transform rounded-r-md ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } transition-transform duration-300 ease-in-out md:translate-x-0 z-10`}
       >
@@ -34,9 +35,7 @@ export default function Home() {
         </div>
     
         <nav className="mt-4">
-          <div className="bg-[#236daa] hover:bg-[#337ab4] dark:bg-slate-900 dark:hover:bg-slate-800 cursor-pointer w-full h-[4rem] p-5 rounded-md">
-          Fisrt
-          </div>
+          <Chat />
         </nav>
       </div>
 
