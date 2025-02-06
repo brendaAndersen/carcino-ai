@@ -156,10 +156,7 @@ export function ChatAI() {
         draggable
         pauseOnHover
         theme="light"
-        toastClassName={() =>
-          "bg-[#226094] dark:bg-slate-800 text-white rounded-lg shadow-lg p-4 border border-[#0fcedc]"
-        }
-        bodyClassName={() => "text-sm leading-relaxed"}
+        toastClassName="bg-[#226094] dark:bg-slate-800 text-white rounded-lg shadow-lg p-4 border border-[#0fcedc]"
         progressClassName="bg-[#0fcedc]"
       />
 
