@@ -1,50 +1,42 @@
 'use client'
-import { Chat } from "@/components/Chat";
+import { Header } from "@/components/header";
 import { ThemeToggle } from "@/components/Toggle";
-import { ChatAI } from "@/components/ui/ChatAI";
-import React, { useState } from 'react';
+import Link from "next/link";
 
-export default function Home() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
-  return (
-    <>
-    <header className="fixed top-0 left-0 flex items-center justify-between p-5 w-full h-[60px] bg-white dark:bg-slate-950 shadow-md md:pl-64 z-10">
-      <h1 className="absolute left-1/2 transform -translate-x-1/2 text-center">Welcome!</h1>
-      <div className="justify-self-end p-4 ml-auto">
-        <ThemeToggle />
-      </div>
-    </header>
-
-
-    <div className="flex h-screen overflow-x-hidden">
-      <button
-        className="md:hidden fixed top-4 left-4 p-2 bg-gray-800 text-white rounded z-20"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        ☰
-      </button>
-
-      <div
-        className={`fixed top-0 left-0 h-full w-80 p-2 bg-[#226094] dark:bg-slate-950 text-white transform rounded-r-md ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } transition-transform duration-300 ease-in-out md:translate-x-0 z-10`}
-      >
-        <div className="pt-[60px] md:p-4 lg:p-4">
-          <h2 className="text-lg font-semibold">History</h2>
-        </div>
-    
-        <nav className="mt-4">
-          <Chat />
-        </nav>
-      </div>
-
-      <div className="flex-1 pt-[60px] md:ml-64">
-        <div className="grid w-full h-full items-center justify-center bg-[url('https://carcinocheck.com.br/assets/images/banner-bg.jpg')] bg-cover bg-center dark:bg-slate-900 dark:bg-none">
-          <ChatAI />
-        </div>
-      </div>
-    </div>
-    </>
-  );
+export default function Page() {
+    return (
+        <>
+            <Header>
+                <nav className="flex gap-5 w-full justify-center">
+                    <Link className="pt-2 hover:border-blue-700 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-blue-800 dark:hover:text-slate-500" href="/">Home</Link>
+                    <Link className="pt-2 hover:border-blue-700 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-blue-800 dark:hover:text-slate-500" href="/login">Doctor Login</Link>
+                    <Link className="pt-2 hover:border-blue-700 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-blue-800 dark:hover:text-slate-500" href="/patient-login">Patient Login</Link>
+                    <Link className="text-white bg-blue-600 hover:bg-blue-500 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-md p-2" href="/doctor-register">Doctor Register</Link>
+                </nav>
+                <div className="justify-self-end p-4 ml-auto">
+                    <ThemeToggle />
+                </div>
+            </Header>
+            <div
+                className={`bg-bg-img bg-cover bg-center flex justify-center items-center text-center w-screen min-h-[calc(100vh-120px)]`}>
+                <div className="pt-10 text-left">
+                    <span className="text-sm text-slate-500">
+                        Caring for better life
+                    </span>
+                    <h1 className="text-2xl">
+                        Leading the way in oncology medical excellence
+                    </h1>
+                    <div className="text-sm text-justify text-slate-400 leading-relaxed max-w-3xl mx-auto space-y-4">
+                        <p>
+                            Pipac Brazils patient management system for oncology is a comprehensive software solution designed to streamline and enhance the care of oncology patients.
+                        </p>
+                        <p>
+                            Pipac Brazil is an innovative startup focused on providing patient management solutions for oncology. Our system helps streamline and enhance patient care.
+                            With a commitment to medical excellence and technological innovation, we are leading the way to a better future in oncology care management.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
 }

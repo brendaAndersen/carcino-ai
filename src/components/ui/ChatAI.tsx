@@ -80,7 +80,7 @@ export function ChatAI() {
           formData,
           {
             headers: {
-              Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`, // adicionar key
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`,
               'Content-Type': 'multipart/form-data',
             },
           }
@@ -101,7 +101,7 @@ export function ChatAI() {
           },
           {
             headers: {
-              Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`, // adicionar key
+              Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`,
               'Content-Type': 'application/json',
             },
           }
