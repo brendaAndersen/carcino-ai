@@ -10,7 +10,7 @@ export default {
 	theme: {
 		extend: {
 			backgroundImage: {
-				'bg-img': 'url(/banner-bg1.png)'
+				'banner': "url('https://www.carcinocheck.com.br/assets/images/banner-bg.jpg')",
 			},
 			darkMode: 'class',
 			borderRadius: {
@@ -59,7 +59,16 @@ export default {
 					'4': 'hsl(var(--chart-4))',
 					'5': 'hsl(var(--chart-5))'
 				}
-			}
+			},
+			keyframes: {
+				'slide-down': {
+					'0%': { transform: 'translateY(-100%)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' },
+				},
+			},
+			animation: {
+				'slide-down': 'slide-down 1.5s ease-out forwards',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

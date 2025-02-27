@@ -59,9 +59,9 @@
   }
 }
 
-#idCarcinocheck {
+/* #idCarcinocheck {
   color: white !important;
-}
+} */
 
 @layer base {
   * {

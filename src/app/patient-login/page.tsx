@@ -18,19 +18,20 @@ export default function PatientLogin() {
     return (<>
         <Header>
             <nav className="flex gap-5 w-full justify-center">
-                <Link className="pt-2 hover:border-blue-700 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-blue-800 dark:hover:text-slate-500" href="/">Home</Link>
-                <Link className="pt-2 hover:border-blue-700 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-blue-800 dark:hover:text-slate-500" href="/login">Doctor Login</Link>
-                <Link className="pt-2 hover:border-blue-700 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-blue-800 dark:hover:text-slate-500" href="/patient-login">Patient Login</Link>
-                <Link className="text-white bg-blue-600 hover:bg-blue-500 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-md p-2" href="/doctor-register">Doctor Register</Link>
+                <Link className="pt-2 hover:border-slate-300 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-slate-100 text-slate-300 dark:hover:text-slate-500" href="/">Home</Link>
+                <Link className="pt-2 hover:border-slate-300 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-slate-100 text-slate-300 dark:hover:text-slate-500" href="/login">Doctor Login</Link>
+                <Link className="pt-2 hover:border-slate-300 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-slate-100 text-slate-300 dark:hover:text-slate-500" href="/patient-login">Patient Login</Link>
+                <Link className="text-white bg-blue-700 hover:bg-blue-500 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-md p-2" href="/doctor-register">Doctor Register</Link>
             </nav>
             <div className="justify-self-end p-4 ml-auto">
                 <ThemeToggle />
             </div>
         </Header>
-        <div className="flex text-center justify-center items-center min-h-[calc(100vh-120px)] gap-5">
-            <form className="flex w-64 flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
-                <h1 className="text-2xl">Patient Login</h1>
-                <p className="text-xs text-slate-500">
+        <div className="bg-banner dark:bg-none bg-cover bg-center flex justify-center items-center 
+                    text-center w-screen min-h-[calc(100vh-90px)] gap-5">
+            <form className="flex w-96 p-10 flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
+                <h1 className="text-2xl animate-slide-down">Patient Login</h1>
+                <p className="text-xs text-slate-500 animate-slide-down">
                     Enter your patient number and password
                     <span className="block">
                         to access Patient panel.
@@ -78,7 +79,7 @@ export default function PatientLogin() {
                     {errors?.password && <p>{errors?.password?.message}</p>}
                 </div>
 
-                <button className="bg-blue-600 hover:bg-blue-500 text-white dark:hover:bg-slate-600 rounded-md p-2 dark:bg-slate-700" type="submit">Enviar</button>
+                <button className="bg-blue-700 hover:bg-blue-500 text-white dark:hover:bg-slate-600 rounded-md p-2 dark:bg-slate-700" type="submit">Enviar</button>
             </form>
         </div>
     </>)
