@@ -12,9 +12,10 @@ import axios from "axios";
 
 type Message = {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
 };
+
 
 export function ChatAI() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -79,13 +80,17 @@ export function ChatAI() {
 
     const assistantMessageId = `assistant-${Date.now()}`;
     setMessages((prev) => {
-      const updatedMessages = [...prev, {
-        id: assistantMessageId,
-        role: 'assistant',
-        content: ''
-      }];
+      const updatedMessages: Message[] = [
+        ...prev,
+        {
+          id: assistantMessageId,
+          role: "assistant",
+          content: '',
+        }
+      ];
       return updatedMessages;
     });
+
 
     setInput('');
 
