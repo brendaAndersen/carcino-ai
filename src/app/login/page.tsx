@@ -1,5 +1,6 @@
 'use client'
 import { Header } from "@/components/header";
+import Layout from "@/components/layout";
 import { ThemeToggle } from "@/components/Toggle";
 import Link from "next/link";
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
@@ -16,7 +17,7 @@ export default function Login() {
         alert('Estamos em desenvolvimento!')
     }
     return (
-        <>
+        <Layout>
             <Header>
                 <nav className="flex gap-5 w-full justify-center">
                     <Link className="pt-2 hover:border-slate-300 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-slate-100 text-slate-300 dark:hover:text-slate-500" href="/">Home</Link>
@@ -85,5 +86,5 @@ export default function Login() {
                     <button className="bg-blue-600 hover:bg-blue-400 text-white dark:hover:bg-slate-600 rounded-md p-2 dark:bg-slate-700" type="submit">Enviar</button>
                 </form>
             </div>
-        </>)
+        </Layout>)
 }

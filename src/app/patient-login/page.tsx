@@ -3,6 +3,7 @@ import { Header } from "@/components/header";
 import { ThemeToggle } from "@/components/Toggle";
 import Link from "next/link";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import Layout from "@/components/layout";
 
 type Patient = {
     patientNumber: string;
@@ -15,7 +16,7 @@ export default function PatientLogin() {
         console.log(data);
         alert('Estamos em desenvolvimento!')
     }
-    return (<>
+    return (<Layout>
         <Header>
             <nav className="flex gap-5 w-full justify-center">
                 <Link className="pt-2 hover:border-slate-300 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-slate-100 text-slate-300 dark:hover:text-slate-500" href="/">Home</Link>
@@ -82,6 +83,6 @@ export default function PatientLogin() {
                 <button className="bg-blue-700 hover:bg-blue-500 text-white dark:hover:bg-slate-600 rounded-md p-2 dark:bg-slate-700" type="submit">Enviar</button>
             </form>
         </div>
-    </>)
+    </Layout>)
 
 }

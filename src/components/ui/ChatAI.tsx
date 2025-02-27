@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { IoMdSend } from "react-icons/io";
-// import { FaRegStopCircle } from "react-icons/fa";
+import { FaRegStopCircle } from "react-icons/fa";
 import axios from "axios";
 
 type Message = {
@@ -20,8 +20,10 @@ export function ChatAI() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [file, setFile] = useState<File | undefined>();
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  // const storedData = localStorage.getItem('newChat');
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const savedMessages = loadMessagesFromLocalStorage();
@@ -29,6 +31,10 @@ export function ChatAI() {
       setMessages(savedMessages);
     }
   }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleUpload = () => {
     fileInputRef.current?.click();
@@ -43,19 +49,21 @@ export function ChatAI() {
     return messages ? JSON.parse(messages) : [];
   };
 
-  // if (storedData) {
-  //   const parsedData = JSON.parse(storedData);
-  //   if (Array.isArray(parsedData) && parsedData.length === 0) {
-  //     console.log("O array de itens está vazio.");
-  //   } else {
-  //     console.log("O array de itens não está vazio:", Object.values(parsedData).map((e) => e));
-  //   }
-  // } else {
-  //   console.log("Nenhum dado encontrado no storage.");
-  // }
+  const stopStreaming = () => {
+    if (abortController) {
+      abortController.abort();
+      setIsStreaming(false);
+      setAbortController(null);
+    }
+  };
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!input.trim() && !file) {
+      toast('Necessário encaminhar uma mensagem ou arquivo');
+      return;
+    }
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
@@ -69,76 +77,160 @@ export function ChatAI() {
       return updatedMessages;
     });
 
+    const assistantMessageId = `assistant-${Date.now()}`;
+    setMessages((prev) => {
+      const updatedMessages = [...prev, {
+        id: assistantMessageId,
+        role: 'assistant',
+        content: ''
+      }];
+      return updatedMessages;
+    });
+
+    setInput('');
+
     try {
       if (file) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('user', 'abc-123');
+        try {
+          const formData = new FormData();
+          const user = localStorage.getItem('user');
 
-        const uploadResponse = await axios.post(
-          'https://api.dify.ai/v1/files/upload',
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`,
-              'Content-Type': 'multipart/form-data',
-            },
+          formData.append('file', file);
+
+          if (user !== null) {
+            formData.append('user', user);
+          } else {
+            formData.append('user', '');
           }
-        );
 
-        console.log('Arquivo enviado com sucesso:', uploadResponse.data);
+          await axios.post(
+            'https://api.dify.ai/v1/files/upload',
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`,
+                'Content-Type': 'multipart/form-data',
+              },
+            }
+          );
+
+          setFile(undefined);
+        } catch (error) {
+          console.error('Erro ao enviar arquivo:', error);
+          toast('Erro ao enviar arquivo. Tente novamente.');
+        }
       }
 
-      if (input) {
-        const response = await axios.post(
-          'https://api.dify.ai/v1/chat-messages',
-          {
-            inputs: {},
-            query: input,
-            response_mode: 'blocking',
-            conversation_id: '',
-            user: 'abc-123',
+      const userId = localStorage.getItem('user') || `user-${Math.random().toString(36).substring(2, 10)}`;
+      localStorage.setItem('user', userId);
+
+      const controller = new AbortController();
+      setAbortController(controller);
+      setIsStreaming(true);
+
+      const response = await fetch('https://api.dify.ai/v1/chat-messages', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inputs: {
+            text: input,
+            user_question: input,
+            user_name: "Usuário",
+            // user_symptoms: userSymptoms || "",
+            user_location: "Brasil"
           },
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`,
-              'Content-Type': 'application/json',
-            },
+          query: input,
+          response_mode: 'streaming',
+          conversation_id: '',
+          user: userId,
+        }),
+        signal: controller.signal
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro na API: ${response.status}`);
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('Não foi possível iniciar o streaming');
+
+      const decoder = new TextDecoder();
+      let fullContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+
+        try {
+          const lines = chunk.split('\n\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const jsonStr = line.substring(6);
+              if (jsonStr.trim() && jsonStr !== '[DONE]') {
+                try {
+                  const data = JSON.parse(jsonStr);
+                  if (data.answer !== undefined) {
+                    fullContent += data.answer;
+
+                    setMessages(prev => {
+                      const updatedMessages = [...prev];
+                      const assistantMsgIndex = updatedMessages.findIndex(msg => msg.id === assistantMessageId);
+                      if (assistantMsgIndex !== -1) {
+                        updatedMessages[assistantMsgIndex] = {
+                          ...updatedMessages[assistantMsgIndex],
+                          content: fullContent
+                        };
+                      }
+                      return updatedMessages;
+                    });
+                  }
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                } catch (jsonError) {
+                  console.log('Chunk JSON incompleto, aguardando mais dados...');
+                }
+              }
+            }
           }
-        );
+        } catch (e) {
+          console.error('Erro ao processar chunk:', e);
+        }
+      }
 
-        const assistantMessage: Message = {
-          id: `assistant-${Date.now()}`,
-          role: 'assistant',
-          content: response?.data.answer,
-        };
+      setMessages(prev => {
+        saveMessagesToLocalStorage(prev);
+        return prev;
+      });
 
-        setMessages((prev) => {
-          const updatedMessages = [...prev, assistantMessage];
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Streaming foi interrompido pelo usuário');
+      } else {
+        console.error('Erro durante a comunicação com a API:', error);
+
+        // Atualiza a mensagem do assistente com o erro
+        setMessages(prev => {
+          const updatedMessages = [...prev];
+          const assistantMsgIndex = updatedMessages.findIndex(msg => msg.id === assistantMessageId);
+          if (assistantMsgIndex !== -1) {
+            updatedMessages[assistantMsgIndex] = {
+              ...updatedMessages[assistantMsgIndex],
+              content: 'Desculpe, ocorreu um erro. Tente novamente mais tarde.'
+            };
+          }
           saveMessagesToLocalStorage(updatedMessages);
           return updatedMessages;
         });
-      } else {
-        toast('Necessário encaminhar uma mensagem');
+
+        toast('Erro ao se comunicar com a IA. Tente novamente.');
       }
-    } catch (error) {
-      console.error('Erro ao enviar mensagem:', error);
-
-      const errorMessage: Message = {
-        id: `error-${Date.now()}`,
-        role: 'assistant',
-        content: 'Desculpe, ocorreu um erro. Tente novamente.',
-      };
-
-      setMessages((prev) => {
-        const updatedMessages = [...prev, errorMessage];
-        saveMessagesToLocalStorage(updatedMessages);
-        return updatedMessages;
-      });
-    }
-    if (input) {
-      setInput('');
-      setFile(undefined);
+    } finally {
+      setIsStreaming(false);
+      setAbortController(null);
     }
   };
 
@@ -168,31 +260,28 @@ export function ChatAI() {
         <CardContent className="space-y-4 overflow-y-auto max-h-[500px] p-4">
 
           {messages.map((msg) => (
-            msg.content && (
-              <div key={msg.id} className="flex gap-3 text-slate-600 dark:text-slate-400 text-sm text-justify">
-                {msg.role === 'user' && (
-                  <Avatar className="dark:bg-gray-200">
-                    <AvatarImage src="https://www.webiconio.com/_upload/255/image_255.svg" />
-                    <AvatarFallback className="text-gray-800 dark:white">User</AvatarFallback>
-                  </Avatar>
-                )}
-                {msg.role === "assistant" && (
-                  <Avatar>
-                    <AvatarFallback>AI</AvatarFallback>
-                    <AvatarImage src="https://img.myloview.com.br/posters/robot-logo-design-700-158968747.jpg" />
-                  </Avatar>
-                )}
-                <p className="leading-relaxed">
-                  <span className="block font-bold text-[#0879d8]">
-                    {msg.role === "user" ? "User" : "AI"}
-                  </span>
-                  {msg.content}
-                </p>
-              </div>
-            )
-          ))
-          }
-
+            <div key={msg.id} className="flex gap-3 text-slate-600 dark:text-slate-400 text-sm text-justify">
+              {msg.role === 'user' && (
+                <Avatar className="dark:bg-gray-200">
+                  <AvatarImage src="https://www.webiconio.com/_upload/255/image_255.svg" />
+                  <AvatarFallback className="text-gray-800 dark:white">User</AvatarFallback>
+                </Avatar>
+              )}
+              {msg.role === "assistant" && (
+                <Avatar>
+                  <AvatarFallback>AI</AvatarFallback>
+                  <AvatarImage src="https://img.myloview.com.br/posters/robot-logo-design-700-158968747.jpg" />
+                </Avatar>
+              )}
+              <p className="leading-relaxed">
+                <span className="block font-bold text-[#0879d8]">
+                  {msg.role === "user" ? "User" : "AI"}
+                </span>
+                {msg.content || (msg.role === 'assistant' && isStreaming ? '...' : '')}
+              </p>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
         </CardContent>
 
         <CardFooter>
@@ -203,11 +292,12 @@ export function ChatAI() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 className="pl-9"
+                disabled={isStreaming}
               />
 
               <FiPaperclip
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
-                onClick={handleUpload}
+                className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isStreaming ? 'text-gray-300' : 'text-gray-400 cursor-pointer'}`}
+                onClick={isStreaming ? undefined : handleUpload}
               />
 
               <input
@@ -215,12 +305,32 @@ export function ChatAI() {
                 type="file"
                 onChange={(e) => setFile(e.target.files ? e.target.files[0] : undefined)}
                 className="hidden"
+                disabled={isStreaming}
               />
+
+              {file && (
+                <div className="text-xs text-gray-500 mt-1 ml-2">
+                  Arquivo: {file.name}
+                </div>
+              )}
             </div>
-            <Button className="hover:bg-[#3f89ce] bg-[#0879d8] text-white" type="submit">
-              <IoMdSend />
-              {/* <FaRegStopCircle /> */}
-            </Button>
+            {isStreaming ? (
+              <Button
+                className="bg-red-500 hover:bg-red-600 text-white"
+                type="button"
+                onClick={stopStreaming}
+              >
+                <FaRegStopCircle />
+              </Button>
+            ) : (
+              <Button
+                className="hover:bg-[#3f89ce] bg-[#0879d8] text-white"
+                type="submit"
+                disabled={!input.trim() && !file}
+              >
+                <IoMdSend />
+              </Button>
+            )}
           </form>
         </CardFooter>
       </Card>

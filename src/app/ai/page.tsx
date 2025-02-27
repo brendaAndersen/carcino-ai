@@ -27,7 +27,7 @@ export default function Home() {
         </button>
 
         <div
-          className={`fixed top-0 left-0 h-full w-80 p-2 bg-[#226094] dark:bg-slate-950 text-white transform rounded-r-md ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          className={`animate-none lg:animate-slide-right md:animate-slide-right fixed top-0 left-0 h-full w-80 p-2 bg-[#2563eb] dark:bg-slate-950 text-white transform rounded-r-md ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
             } transition-transform duration-300 ease-in-out md:translate-x-0 z-10`}
         >
           <div className="pt-[60px] md:p-4 lg:p-4">

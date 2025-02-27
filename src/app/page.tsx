@@ -1,11 +1,16 @@
 'use client'
 import { Header } from "@/components/header";
+import Layout from "@/components/layout";
 import { ThemeToggle } from "@/components/Toggle";
 import Link from "next/link";
+import { FaRobot } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+    const router = useRouter();
+
     return (
-        <>
+        <Layout>
             <Header>
                 <nav className="flex gap-5 w-full justify-center">
                     <Link className="pt-2 hover:border-slate-300 dark:hover:border-gray-600 hover:border-b-2 border-dotted hover:text-slate-100 text-slate-300 dark:hover:text-slate-500" href="/">Home</Link>
@@ -20,7 +25,7 @@ export default function Page() {
             <div
                 className={`bg-banner dark:bg-none bg-cover bg-center h-[500px]
                 flex items-center w-screen 
-                min-h-[calc(100vh-90px)]
+                min-h-[calc(100vh-150px)]
                 justify-start dark:justify-center
                 text-left dark:text-center pl-20 dark:pl-0`}
             >
@@ -46,8 +51,14 @@ export default function Page() {
                         </p>
                     </div>
                 </div>
-
             </div >
-        </>
+            <div className="bottom-14 left-2 flex justify-end p-4">
+                <div className="rounded-3xl border-2 border-slate-300 w-10 h-10 hover:scale-125 hover:cursor-pointer flex items-center justify-center">
+                    <FaRobot className="w-7 h-7" onClick={() => router.push("/ai")} />
+                </div>
+            </div>
+
+
+        </Layout>
     )
 }
