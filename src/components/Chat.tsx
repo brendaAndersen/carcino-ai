@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+
 export const Chat = () => {
     const [conversation, setConversation] = useState([]);
 
@@ -10,8 +11,11 @@ export const Chat = () => {
 
     const handleClick = async (id: string) => {
 
-        const response = await axios.get(
-            `https://api.dify.ai/v1/messages?user=abc-123&conversation_id=` + id,
+        const params = new URLSearchParams({
+            user: "abc-123",
+            conversation_id: id
+        });
+        const response = await axios.get(`/api/proxy/messages?${params.toString()}`,
             {
                 headers: {
                     Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`,
@@ -25,9 +29,14 @@ export const Chat = () => {
 
     const handleInitialization = async () => {
         const user = localStorage.getItem('user');
+        const params = new URLSearchParams({
+            user: user || "", 
+            limit: "20", 
+        });
+        
         try {
             const response = await axios.get(
-                `https://api.dify.ai/v1/conversations?user=${user}&last_id=&limit=20`,
+                `/api/proxy/conversations?${params.toString()}`,
                 {
                     headers: {
                         Authorization: `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`,

@@ -43,11 +43,11 @@ export default function Page() {
 
                     <div className="animate-slide-down text-sm text-slate-500 dark:text-slate-500 leading-relaxed max-w-lg space-y-4 text-justify dark:text-justify">
                         <p>
-                            Pipac Brazil&apos;s patient management system for oncology is a comprehensive software solution designed to streamline and enhance the care of oncology patients.
+                            Medicine has been constantly transformed by technological innovation, with Artificial Intelligence (AI) standing out as one of the main tools for optimizing diagnoses and treatments.
+
                         </p>
                         <p>
-                            Pipac Brazil is an innovative startup focused on providing patient management solutions for oncology. Our system helps streamline and enhance patient care.
-                            With a commitment to medical excellence and technological innovation, we are leading the way to a better future in oncology care management.
+                            In an unprecedented advancement, the world&apos;s first AI system has been developed and certified, with scientific information validated by the most respected professionals globally, dedicated to assisting in the diagnosis and treatment of peritoneal carcinomatosis, a complex and challenging oncological condition.
                         </p>
                     </div>
                 </div>

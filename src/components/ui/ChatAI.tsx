@@ -2,13 +2,14 @@
 import { ToastContainer, toast } from 'react-toastify';
 import React, { useEffect, useRef, useState } from 'react';
 import { FiPaperclip } from "react-icons/fi";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { IoMdSend } from "react-icons/io";
 import { FaRegStopCircle } from "react-icons/fa";
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faRobot } from "@fortawesome/free-solid-svg-icons";
 
 type Message = {
   id: string;
@@ -109,7 +110,7 @@ export function ChatAI() {
           }
 
           await axios.post(
-            'https://api.dify.ai/v1/files/upload',
+            '/api/proxy/files/upload',
             formData,
             {
               headers: {
@@ -132,11 +133,9 @@ export function ChatAI() {
       const controller = new AbortController();
       setAbortController(controller);
       setIsStreaming(true);
-
-      const response = await fetch('https://api.dify.ai/v1/chat-messages', {
+      const response = await fetch('/api/proxy', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_KEY_API}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -144,15 +143,13 @@ export function ChatAI() {
             text: input,
             user_question: input,
             user_name: "Usuário",
-            // user_symptoms: userSymptoms || "",
-            user_location: "Brasil"
+            user_location: "Brasil",
           },
           query: input,
           response_mode: 'streaming',
           conversation_id: '',
           user: userId,
         }),
-        signal: controller.signal
       });
 
       if (!response.ok) {
@@ -217,7 +214,6 @@ export function ChatAI() {
       } else {
         console.error('Erro durante a comunicação com a API:', error);
 
-        // Atualiza a mensagem do assistente com o erro
         setMessages(prev => {
           const updatedMessages = [...prev];
           const assistantMsgIndex = updatedMessages.findIndex(msg => msg.id === assistantMessageId);
@@ -263,27 +259,30 @@ export function ChatAI() {
           <CardDescription>Caring for better life</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 overflow-y-auto max-h-[500px] p-4">
-
           {messages.map((msg) => (
-            <div key={msg.id} className="flex gap-3 text-slate-600 dark:text-slate-400 text-sm text-justify">
-              {msg.role === 'user' && (
-                <Avatar className="dark:bg-gray-200">
-                  <AvatarImage src="https://www.webiconio.com/_upload/255/image_255.svg" />
-                  <AvatarFallback className="text-gray-800 dark:white">User</AvatarFallback>
-                </Avatar>
-              )}
+            <div
+              key={msg.id}
+              className={`flex gap-3 items-start ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
               {msg.role === "assistant" && (
-                <Avatar>
-                  <AvatarFallback>AI</AvatarFallback>
-                  <AvatarImage src="https://img.myloview.com.br/posters/robot-logo-design-700-158968747.jpg" />
-                </Avatar>
+                <FontAwesomeIcon icon={faRobot} className="mt-1 flex-shrink-0" />
               )}
-              <p className="leading-relaxed">
-                <span className="block font-bold text-[#0879d8]">
+              <div
+                className={`p-3 rounded-lg w-fit max-w-[80%] ${msg.role === 'user'
+                  ? 'bg-[#0879d8] text-white rounded-tr-none'
+                  : 'bg-gray-200 dark:bg-slate-900 rounded-tl-none'
+                  }`}
+              >
+                <span className="block font-bold">
                   {msg.role === "user" ? "User" : "AI"}
                 </span>
-                {msg.content || (msg.role === 'assistant' && isStreaming ? '...' : '')}
-              </p>
+                <p className="text-sm">
+                  {msg.content || (msg.role === 'assistant' && isStreaming ? '...' : '')}
+                </p>
+              </div>
+              {msg.role === 'user' && (
+                <FontAwesomeIcon icon={faUser} className="mt-1 flex-shrink-0" />
+              )}
             </div>
           ))}
           <div ref={messagesEndRef} />
